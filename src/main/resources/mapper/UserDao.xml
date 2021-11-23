@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hengheng.dao.UserDao">
+
+    <resultMap type="com.hengheng.entity.User" id="UserMap">
+        <result property="pkid" column="PKID" jdbcType="INTEGER"/>
+        <result property="phone" column="PHONE" jdbcType="VARCHAR"/>
+        <result property="idCard" column="ID_CARD" jdbcType="VARCHAR"/>
+        <result property="address" column="ADDRESS" jdbcType="VARCHAR"/>
+        <result property="name" column="NAME" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="UserMap">
+        select
+          PKID, PHONE, ID_CARD, ADDRESS, NAME
+        from user
+        where PKID = #{pkid}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="UserMap">
+        select
+          PKID, PHONE, ID_CARD, ADDRESS, NAME
+        from user
+        <where>
+            <if test="pkid != null">
+                and PKID = #{pkid}
+            </if>
+            <if test="phone != null and phone != ''">
+                and PHONE = #{phone}
+            </if>
+            <if test="idCard != null and idCard != ''">
+                and ID_CARD = #{idCard}
+            </if>
+            <if test="address != null and address != ''">
+                and ADDRESS = #{address}
+            </if>
+            <if test="name != null and name != ''">
+                and NAME = #{name}
+            </if>
+        </where>
+        limit #{pageable.offset}, #{pageable.pageSize}
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from user
+        <where>
+            <if test="pkid != null">
+                and PKID = #{pkid}
+            </if>
+            <if test="phone != null and phone != ''">
+                and PHONE = #{phone}
+            </if>
+            <if test="idCard != null and idCard != ''">
+                and ID_CARD = #{idCard}
+            </if>
+            <if test="address != null and address != ''">
+                and ADDRESS = #{address}
+            </if>
+            <if test="name != null and name != ''">
+                and NAME = #{name}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="pkid" useGeneratedKeys="true">
+        insert into user(PHONE, ID_CARD, ADDRESS, NAME)
+        values (#{phone}, #{idCard}, #{address}, #{name})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="pkid" useGeneratedKeys="true">
+        insert into user(PHONE, ID_CARD, ADDRESS, NAME)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+        (#{entity.phone}, #{entity.idCard}, #{entity.address}, #{entity.name})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="pkid" useGeneratedKeys="true">
+        insert into user(PHONE, ID_CARD, ADDRESS, NAME)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.phone}, #{entity.idCard}, #{entity.address}, #{entity.name})
+        </foreach>
+        on duplicate key update
+        PHONE = values(PHONE),
+        ID_CARD = values(ID_CARD),
+        ADDRESS = values(ADDRESS),
+        NAME = values(NAME)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update user
+        <set>
+            <if test="phone != null and phone != ''">
+                PHONE = #{phone},
+            </if>
+            <if test="idCard != null and idCard != ''">
+                ID_CARD = #{idCard},
+            </if>
+            <if test="address != null and address != ''">
+                ADDRESS = #{address},
+            </if>
+            <if test="name != null and name != ''">
+                NAME = #{name},
+            </if>
+        </set>
+        where PKID = #{pkid}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from user where PKID = #{pkid}
+    </delete>
+
+</mapper>
+
